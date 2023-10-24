@@ -10,7 +10,7 @@ app.use(cors())
 app.use(express.json())
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.zku3u3r.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -29,13 +29,28 @@ async function run() {
 
     const productCollection = client.db('productsDB').collection('products');
 
+    // get all products of specific brand 
+    app.get('/products/:brand', async (req, res) => {
+      const brand = req.params.brand;
+      const query = {brandName: brand}
+      const cursor = productCollection.find(query)
+      const result = await cursor.toArray()
+      res.send(result)
+    })
 
+
+
+    // get all products
     app.post('/products', async (req, res) =>{
       const newProduct = req.body;
       console.log(newProduct)
       const result = await productCollection.insertOne(newProduct)
       res.send(result)
     })
+
+
+
+
     
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
