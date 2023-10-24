@@ -55,7 +55,25 @@ async function run() {
       res.send(result)
     })
 
-
+    // update specific product
+    app.patch('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedProduct = req.body;
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert: true}
+      const updateDoc = {
+        $set: {
+          name: updatedProduct.name,
+          brandName: updatedProduct.brandName,
+          type: updatedProduct.type,
+          price: updatedProduct.price,
+          rating: updatedProduct.rating,
+          image: updatedProduct.image,
+        }
+      }
+      const result = await productCollection.updateOne(filter, updateDoc, options)
+      res.send(result)
+    })
 
     
     
