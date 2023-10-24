@@ -76,6 +76,14 @@ async function run() {
       res.send(result)
     })
 
+    // read all products of cart
+    app.get('/cart', async (req, res) => {
+      const cursor = cart.find()
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+
+
     // add to cart
     app.post('/cart', async (req, res) => {
       const product = req.body;
