@@ -38,7 +38,14 @@ async function run() {
       res.send(result)
     })
 
-
+    // get single products depends on specific id
+    app.get('/product_details/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id)
+      const filter = {_id: new ObjectId(id)}
+      const result = await productCollection.findOne(filter)
+      res.send(result)
+    })
 
     // get all products
     app.post('/products', async (req, res) =>{
@@ -50,7 +57,7 @@ async function run() {
 
 
 
-
+    
     
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
