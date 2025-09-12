@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 const app = express()
@@ -10,7 +11,6 @@ app.use(cors())
 app.use(express.json())
 
 
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.zku3u3r.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -29,8 +29,9 @@ async function run() {
 
     const productCollection = client.db('productsDB').collection('products');
     const cart = client.db('productsDB').collection('cart')
+    const sliderCollection = client.db('productsDB').collection('sliderImages')
 
-    // get all products of specific brand 
+    // get all products of specific brand
     app.get('/products/:brand', async (req, res) => {
       const brand = req.params.brand;
       const query = {brandName: brand}
@@ -42,16 +43,14 @@ async function run() {
     // get single products depends on specific id
     app.get('/product_details/:id', async (req, res) => {
       const id = req.params.id;
-      console.log(id)
       const filter = {_id: new ObjectId(id)}
       const result = await productCollection.findOne(filter)
       res.send(result)
     })
 
-    // get all products
+    // insert products to database
     app.post('/products', async (req, res) =>{
       const newProduct = req.body;
-      console.log(newProduct)
       const result = await productCollection.insertOne(newProduct)
       res.send(result)
     })
@@ -76,6 +75,14 @@ async function run() {
       res.send(result)
     })
 
+    // read slider image
+    app.get('/sliders/:brand', async (req, res) => {
+      const brand = req.params.brand;
+      const query = {brand: brand}
+      const result = await sliderCollection.findOne(query)
+      res.send(result)
+    })
+
     // read all products of cart
     app.get('/cart', async (req, res) => {
       const cursor = cart.find()
@@ -87,7 +94,6 @@ async function run() {
     // add to cart
     app.post('/cart', async (req, res) => {
       const product = req.body;
-      console.log(product)
       const result = await cart.insertOne(product)
       res.send(result)
     })
